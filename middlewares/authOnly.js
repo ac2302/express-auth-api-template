@@ -10,20 +10,29 @@ function authOnlyMiddleware(roles) {
 
 		if (roles.length === 0) return next();
 
+		let allowed = false;
+
 		roles.forEach((role) => {
+			console.log(role, req.auth.user.role);
+
 			if (!config.auth.roles.list.includes(role)) {
 				console.error(`invalid role ${role}`);
 				return res.status(500).json({ msg: "invalid user role" });
 			}
 
 			if (role == req.auth.user.role) {
+				console.log("go ahead");
+				allowed = true;
 				return next();
 			}
 		});
 
-		return res
-			.status(403)
-			.json({ msg: `you must be ${roles.join(" or ")} to access this route` });
+		if (!allowed)
+			return res
+				.status(403)
+				.json({
+					msg: `you must be ${roles.join(" or ")} to access this route`,
+				});
 	};
 
 	return middleware;
