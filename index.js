@@ -2,6 +2,7 @@ const express = require("express");
 const config = require("./config");
 const mongoose = require("mongoose");
 const authMiddleware = require("./middlewares/auth");
+const tokenMiddleware = require("./middlewares/token");
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 // custom middlewares
 app.use(authMiddleware);
+app.use(tokenMiddleware);
 
 // connect to db
 mongoose.connect(config.db.string, (err) => {
@@ -20,7 +22,6 @@ mongoose.connect(config.db.string, (err) => {
 // routes
 app.use("/auth/", require("./routes/auth"));
 app.use("/user/", require("./routes/user"));
-
 
 app.listen(config.server.port, "0.0.0.0", () => {
 	console.log(`server live on port ${config.server.port}`);
