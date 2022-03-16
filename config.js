@@ -19,5 +19,9 @@ module.exports = {
 			},
 			hashingRounds: 10,
 		},
+		token: {
+			validFor: 1000 * 60 * 60 * 24 * 7, // 1 week
+			length: 32,
+		},
 	},
 };
