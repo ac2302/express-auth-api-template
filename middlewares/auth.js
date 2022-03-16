@@ -1,7 +1,7 @@
 const Token = require("../models/Token");
 const User = require("../models/User");
 
-async function authOnlyMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
 	attatchedToken = req.headers.token;
 
 	// no token
@@ -31,4 +31,4 @@ async function authOnlyMiddleware(req, res, next) {
 	}
 }
 
-module.exports = authOnlyMiddleware;
+module.exports = authMiddleware;
