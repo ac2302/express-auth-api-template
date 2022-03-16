@@ -1,11 +1,15 @@
 const express = require("express");
 const config = require("./config");
 const mongoose = require("mongoose");
+const authOnlyMiddleware = require("./middlewares/auth");
 
 const app = express();
 
 // middlewares
 app.use(express.json());
+
+// custom middlewares
+app.use(authOnlyMiddleware)
 
 // connect to db
 mongoose.connect(config.db.string, (err) => {
