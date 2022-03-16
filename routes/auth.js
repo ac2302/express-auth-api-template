@@ -60,7 +60,7 @@ router.post("/login", async (req, res) => {
 	// looking for user
 	const foundUsers = await User.find({ username: user.username });
 	if (foundUsers.length === 0)
-		return res.status(400).json({ msg: "user not found" });
+		return res.status(404).json({ msg: "user not found" });
 	const foundUser = foundUsers[0];
 
 	// comparing passwords
