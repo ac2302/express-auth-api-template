@@ -19,8 +19,8 @@ const userSchema = mongoose.Schema(
 		},
 		role: {
 			type: String,
-			default: "user",
-			enum: config.auth.roles,
+			default: config.auth.roles.default,
+			enum: config.auth.roles.list,
 		},
 	},
 	{ timestamps: true }

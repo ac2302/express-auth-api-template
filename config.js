@@ -8,7 +8,10 @@ module.exports = {
 		string: process.env.DB_STRING,
 	},
 	auth: {
-		roles: ["user", "admin"],
+		roles: {
+			list: ["user", "admin"],
+			default: "user",
+		},
 		password: {
 			length: {
 				min: 8,
