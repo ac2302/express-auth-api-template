@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const config = require("../config");
 
 const userSchema = mongoose.Schema(
 	{
@@ -19,6 +20,7 @@ const userSchema = mongoose.Schema(
 		role: {
 			type: String,
 			default: "user",
+			enum: config.auth.roles,
 		},
 	},
 	{ timestamps: true }

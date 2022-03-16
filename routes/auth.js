@@ -20,16 +20,16 @@ router.post("/register", async (req, res) => {
 			msg: "this email address is already registered with another account",
 		});
 	if (
-		user.password.length < config.password.length.min ||
-		user.password > config.password.length.max
+		user.password.length < config.auth.password.length.min ||
+		user.password > config.auth.password.length.max
 	)
 		return res.json({
-			err: `password should be between ${config.password.length.min} and ${config.password.length.max} characters`,
+			err: `password should be between ${config.auth.password.length.min} and ${config.auth.password.length.max} characters`,
 		});
 
 	try {
 		// hashing password
-		const salt = bcrypt.genSaltSync(config.password.hashingRounds);
+		const salt = bcrypt.genSaltSync(config.auth.password.hashingRounds);
 		user.password = bcrypt.hashSync(user.password, salt);
 
 		const newUser = new User(user);

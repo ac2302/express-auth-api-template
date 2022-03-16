@@ -7,11 +7,14 @@ module.exports = {
 	db: {
 		string: process.env.DB_STRING,
 	},
-	password: {
-		length: {
-			min: 8,
-			max: 128,
+	auth: {
+		roles: ["user", "admin"],
+		password: {
+			length: {
+				min: 8,
+				max: 128,
+			},
+			hashingRounds: 10,
 		},
-		hashingRounds: 10,
 	},
 };
