@@ -69,6 +69,14 @@ router.post("/login", async (req, res) => {
 		return res.status(404).json({ msg: "user not found" });
 	const foundUser = foundUsers[0];
 
+	// checking verification
+	if (config.auth.requiresEmailVerification) {
+		if (!foundUser.verified)
+			return res.status(403).json({
+				msg: "you must verify email address before logging in",
+			});
+	}
+
 	// comparing passwords
 	if (!bcrypt.compareSync(user.password, foundUser.password))
 		return res.status(400).json({ msg: "incorrect password" });
@@ -151,6 +159,28 @@ router.post("/reset-password", async (req, res) => {
 
 	const salt = bcrypt.genSaltSync(config.auth.password.hashingRounds);
 	user.password = bcrypt.hashSync(password, salt);
+
+	res.json(await user.save());
+});
+
+// verify
+router.post("/verify", async (req, res) => {
+	const email = req.body.email;
+	const otp = req.body.otp;
+
+	if (!(otp && email))
+		return res.status(400).json({ msg: "missing email or otp" });
+
+	// finding otp
+	const foundOTP = await OTP.findOne({ value: otp });
+
+	if (!foundOTP) return res.status(400).json({ msg: "invalid otp" });
+
+	const user = await User.findById(foundOTP.user);
+
+	if (user.email != email) return res.status(400).json({ msg: "invalid otp" });
+
+	user.verified = true;
 
 	res.json(await user.save());
 });

@@ -22,6 +22,10 @@ const userSchema = mongoose.Schema(
 			default: config.auth.roles.default,
 			enum: config.auth.roles.list,
 		},
+		verified: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{ timestamps: true }
 );

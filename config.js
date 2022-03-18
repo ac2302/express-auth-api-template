@@ -18,6 +18,7 @@ module.exports = {
 		},
 	},
 	auth: {
+		requiresEmailVerification: true,
 		roles: {
 			list: ["user", "admin"],
 			default: "user",
