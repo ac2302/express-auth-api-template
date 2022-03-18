@@ -102,9 +102,8 @@ router.post("/generate-otp", async (req, res) => {
 	// generate otp
 	try {
 		const otp = getRandomString(config.auth.otp.length);
-		const salt = bcrypt.genSaltSync(config.auth.otp.hashingRounds);
 		const newOTP = new OTP({
-			value: bcrypt.hashSync(otp, salt),
+			value: otp,
 			user: foundUser,
 		});
 		newOTP.save();
