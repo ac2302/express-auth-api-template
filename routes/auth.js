@@ -7,6 +7,13 @@ const sendMail = require("../utils/sendMail");
 const config = require("../config");
 const getRandomString = require("../utils/getRandomString");
 
+function validatePassword(password) {
+	return !(
+		password.length < config.auth.password.length.min ||
+		password > config.auth.password.length.max
+	);
+}
+
 // register
 router.post("/register", async (req, res) => {
 	const user = req.body;
@@ -23,11 +30,8 @@ router.post("/register", async (req, res) => {
 		return res.status(400).json({
 			msg: "this email address is already registered with another account",
 		});
-	if (
-		user.password.length < config.auth.password.length.min ||
-		user.password > config.auth.password.length.max
-	)
-		return res.json({
+	if (!validatePassword(user.password))
+		return res.status(400).json({
 			err: `password should be between ${config.auth.password.length.min} and ${config.auth.password.length.max} characters`,
 		});
 
@@ -120,6 +124,35 @@ router.post("/generate-otp", async (req, res) => {
 	} catch (err) {
 		return res.status(500).json({ msg: "error generating and sending OTP" });
 	}
+});
+
+// reset password
+router.post("/reset-password", async (req, res) => {
+	const password = req.body.password;
+	const email = req.body.email;
+	const otp = req.body.otp;
+
+	if (!(password && otp && email))
+		return res.status(400).json({ msg: "missing password, email or otp" });
+
+	if (!validatePassword(password))
+		return res.status(400).json({
+			err: `password should be between ${config.auth.password.length.min} and ${config.auth.password.length.max} characters`,
+		});
+
+	// finding otp
+	const foundOTP = await OTP.findOne({ value: otp });
+
+	if (!foundOTP) return res.status(400).json({ msg: "invalid otp" });
+
+	const user = await User.findById(foundOTP.user);
+
+	if (user.email != email) return res.status(400).json({ msg: "invalid otp" });
+
+	const salt = bcrypt.genSaltSync(config.auth.password.hashingRounds);
+	user.password = bcrypt.hashSync(password, salt);
+
+	res.json(await user.save());
 });
 
 module.exports = router;
