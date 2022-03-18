@@ -21,6 +21,11 @@ module.exports = {
 			list: ["user", "admin"],
 			default: "user",
 		},
+		otp: {
+			length: 16,
+			hashingRounds: 10,
+			validFor: 1000 * 60 * 30, // 30 min
+		},
 		password: {
 			length: {
 				min: 8,

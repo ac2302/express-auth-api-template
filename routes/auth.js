@@ -2,6 +2,8 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 const Token = require("../models/Token");
+const OTP = require("../models/OTP");
+const sendMail = require("../utils/sendMail");
 const config = require("../config");
 const getRandomString = require("../utils/getRandomString");
 
@@ -55,7 +57,7 @@ router.post("/login", async (req, res) => {
 	// missing details
 	if (!user) return res.status(400).json({ msg: "missing user in body" });
 	if (!(user.username && user.password))
-		return res.status(400).json({ msg: "missing username, password or email" });
+		return res.status(400).json({ msg: "missing username or password" });
 
 	// looking for user
 	const foundUsers = await User.find({ username: user.username });
@@ -78,7 +80,47 @@ router.post("/login", async (req, res) => {
 	const token = new Token({ value: tokenValue, user: foundUser, ip: req.ip });
 	await token.save();
 
-	res.json({token: tokenValue})
+	res.json({ token: tokenValue });
+});
+
+// generate otp
+router.post("/generate-otp", async (req, res) => {
+	const user = req.body.user;
+
+	// missing details
+	if (!user) return res.status(400).json({ msg: "missing user in body" });
+	if (!user.email) return res.status(400).json({ msg: "missing email" });
+
+	// finding user with email
+	const foundUser = await User.findOne({ email: user.email });
+
+	if (!foundUser)
+		return res
+			.status(404)
+			.json({ msg: `no user registered with email ${user.email}` });
+
+	// generate otp
+	try {
+		const otp = getRandomString(config.auth.otp.length);
+		const salt = bcrypt.genSaltSync(config.auth.otp.hashingRounds);
+		const newOTP = new OTP({
+			value: bcrypt.hashSync(otp, salt),
+			user: foundUser,
+		});
+		newOTP.save();
+
+		// sending otp
+		const emailBody = `Hello ${foundUser.username}
+		<hr />
+		Your OTP is <em>${otp}</em>
+		<br />
+		It is valid for 30 min after generation. i.e till ${newOTP.validTill}`;
+
+		await sendMail(foundUser.email, "One Time Password", emailBody);
+		res.json({ msg: `OTP sent to ${foundUser.email}` });
+	} catch (err) {
+		return res.status(500).json({ msg: "error generating and sending OTP" });
+	}
 });
 
 module.exports = router;
