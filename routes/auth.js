@@ -9,7 +9,7 @@ const getRandomString = require("../utils/getRandomString");
 
 // register
 router.post("/register", async (req, res) => {
-	const user = req.body.user;
+	const user = req.body;
 
 	// missing details
 	if (!user) return res.status(400).json({ msg: "missing user in body" });
@@ -52,7 +52,7 @@ router.get("/exists/:username", async (req, res) => {
 
 // login
 router.post("/login", async (req, res) => {
-	const user = req.body.user;
+	const user = req.body;
 
 	// missing details
 	if (!user) return res.status(400).json({ msg: "missing user in body" });
@@ -85,7 +85,7 @@ router.post("/login", async (req, res) => {
 
 // generate otp
 router.post("/generate-otp", async (req, res) => {
-	const user = req.body.user;
+	const user = req.body;
 
 	// missing details
 	if (!user) return res.status(400).json({ msg: "missing user in body" });
