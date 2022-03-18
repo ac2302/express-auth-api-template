@@ -3,6 +3,7 @@ const config = require("./config");
 const mongoose = require("mongoose");
 const authMiddleware = require("./middlewares/auth");
 const tokenMiddleware = require("./middlewares/token");
+const cleanDB = require("./utils/cleanDB");
 
 const app = express();
 
@@ -26,3 +27,6 @@ app.use("/user/", require("./routes/user"));
 app.listen(config.server.port, "0.0.0.0", () => {
 	console.log(`server live on port ${config.server.port}`);
 });
+
+// clean DB
+setTimeout(cleanDB, config.db.cleanInterval);

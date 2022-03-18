@@ -6,6 +6,7 @@ module.exports = {
 	},
 	db: {
 		string: process.env.DB_STRING,
+		cleanInterval: 1000 * 60 * 5, // 5 min
 	},
 	mail: {
 		credentials: {
