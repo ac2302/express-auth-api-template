@@ -6,6 +6,7 @@ const OTP = require("../models/OTP");
 const sendMail = require("../utils/sendMail");
 const config = require("../config");
 const getRandomString = require("../utils/getRandomString");
+const authOnlyMiddleware = require("../middlewares/authOnly");
 
 function validatePassword(password) {
 	return !(
@@ -97,6 +98,20 @@ router.post("/login", async (req, res) => {
 	await token.save();
 
 	res.json({ token: tokenValue });
+});
+
+// change role of user
+router.post("/role/:id", authOnlyMiddleware(["admin"]), async (req, res) => {
+	const role = req.body.role;
+	if (!role || !config.auth.roles.list.includes(role))
+		return res.status(400).json({ msg: "missing or invalid role" });
+
+	const user = await User.findById(req.params.id);
+
+	if (!user) return res.status(404).json({ msg: "user not found" });
+
+	user.role = role;
+	res.json(await user.save());
 });
 
 // generate otp
