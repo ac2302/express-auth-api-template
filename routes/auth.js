@@ -51,7 +51,11 @@ router.post("/register", async (req, res) => {
 router.get("/exists/:username", async (req, res) => {
 	const foundUsers = await User.find({ username: req.params.username });
 	if (foundUsers.length === 0) return res.json({ exists: false });
-	else return res.json({ exists: true });
+	else
+		return res.json({
+			exists: true,
+			id: foundUsers[0]._id,
+		});
 });
 
 // login
