@@ -1,5 +1,6 @@
-const express = require("express");
 const config = require("./config");
+const express = require("express");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const authMiddleware = require("./middlewares/auth");
 const tokenMiddleware = require("./middlewares/token");
@@ -8,6 +9,7 @@ const cleanDB = require("./utils/cleanDB");
 const app = express();
 
 // middlewares
+app.use(cors({ allowedHeaders: ["*"] }));
 app.use(express.json());
 
 // custom middlewares
